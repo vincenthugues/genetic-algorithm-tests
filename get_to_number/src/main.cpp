@@ -52,7 +52,7 @@ void encodeNextGenChromosome(std::string& encodedChromosome, std::string& prevCh
 		}
 		encodedChromosome += bit;
 	}
-	std::cout << "Mutations: " << mutationsNumber << std::endl;
+	std::cout << "Mutations: " << mutationsNumber << '\n';
 }
 
 // Creates a string of decoded gene characters from an encoded chromosome
@@ -114,31 +114,31 @@ void startGenerations(int targetNumber, int maxGenerations, int genesMinNumber, 
 			encodeChromosome(encodedChromosome, genesNumber);
 		else
 			encodeNextGenChromosome(encodedChromosome, prevChromosome);
-		std::cout << "Encoded chromosome: " << encodedChromosome << std::endl;
+		std::cout << "Encoded chromosome: " << encodedChromosome << '\n';
 		
 		std::string decodedChromosome;
 		decodeChromosome(decodedChromosome, encodedChromosome);
-		std::cout << "Decoded chromosome: " << decodedChromosome << std::endl;
+		std::cout << "Decoded chromosome: " << decodedChromosome << '\n';
 		
 		std::string sanitizedExpression;
 		sanitizeExpression(sanitizedExpression, decodedChromosome);
-		std::cout << "Sanitized expression: " << sanitizedExpression << std::endl;
+		std::cout << "Sanitized expression: " << sanitizedExpression << '\n';
 		
 		int result = 0;
 		eval_expr(sanitizedExpression, result);
-		std::cout << "Chromosome result: " << result << std::endl;
+		std::cout << "Chromosome result: " << result << '\n';
 		
 		if (result != targetNumber) {
 			float fitness = getFitness(result, targetNumber);
 			std::cout << "Chromosome fitness: " << fitness;
 			++generation;
 			if (fitness > prevFitness) {
-				std::cout << " -> selected" << std::endl;
+				std::cout << " -> selected" << '\n';
 				prevChromosome = encodedChromosome;
 				prevFitness = fitness;
 			}
 			else
-				std::cout << " -> rejected" << std::endl;
+				std::cout << " -> rejected" << '\n';
 		}
 		else
 			solutionFound = true;
@@ -153,11 +153,11 @@ void startGenerations(int targetNumber, int maxGenerations, int genesMinNumber, 
 // Sets up the parameters
 void geneticExpressions()
 {
-	int genesMinNumber = 7;
-	int genesMaxNumber = 11;
-	int maxGenerations = 0; // 0 -> no limit
+	int genesMinNumber = 17;
+	int genesMaxNumber = 17;
+	int maxGenerations = 1000000; // 0 -> no limit
 	
-	int targetNumber = getTarget(1, 100);
+	int targetNumber = getTarget(1, 1000);
 	std::cout << "Target number: " << targetNumber << std::endl;
 	
 	startGenerations(targetNumber, maxGenerations, genesMinNumber, genesMaxNumber);
