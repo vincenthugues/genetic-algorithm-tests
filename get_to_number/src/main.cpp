@@ -131,7 +131,6 @@ void startGenerations(int targetNumber, int maxGenerations, int genesMinNumber, 
 		if (result != targetNumber) {
 			float fitness = getFitness(result, targetNumber);
 			std::cout << "Chromosome fitness: " << fitness;
-			++generation;
 			if (fitness > prevFitness) {
 				std::cout << " -> selected" << '\n';
 				prevChromosome = encodedChromosome;
@@ -144,18 +143,19 @@ void startGenerations(int targetNumber, int maxGenerations, int genesMinNumber, 
 			solutionFound = true;
 		
 		std::cout << std::endl;
+		++generation;
 	}
 	
 	std::cout << "Target number: " << targetNumber << std::endl
-		<< "Solution " << (solutionFound ? "" : "not ") << "found after " << generation + 1 << " generations" << std::endl;
+		<< "Solution " << (solutionFound ? "" : "not ") << "found after " << generation << " generations" << std::endl;
 }
 
 // Sets up the parameters
 void geneticExpressions()
 {
-	int genesMinNumber = 17;
-	int genesMaxNumber = 17;
-	int maxGenerations = 1000000; // 0 -> no limit
+	int genesMinNumber = 15;
+	int genesMaxNumber = 19;
+	int maxGenerations = 500000; // 0 -> no limit
 	
 	int targetNumber = getTarget(1, 1000);
 	std::cout << "Target number: " << targetNumber << std::endl;
