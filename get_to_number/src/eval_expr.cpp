@@ -3,13 +3,9 @@
 ** by dasblinkenlight on SO: http://stackoverflow.com/a/11172637
 */
 
-#include <iostream>
-#include <cctype>
+#include "eval_expr.hpp"
 
 using namespace std;
-
-bool eval_expr(const char **pe, int &lhs, bool inside = false);
-bool eval_expr(const std::string& str, int &lhs, bool inside = false);
 
 // gets the next char after skipping optional whitespace
 char skip_ws(const char **pe) {

@@ -3,7 +3,7 @@
 #include <ctime>
 #include <string>
 
-#include "eval_expr.cpp"
+#include "eval_expr.hpp"
 
 const char *geneSequences[15] = { "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", NULL };
 const char genes[15] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*', '/', '\0' };
@@ -76,18 +76,18 @@ void sanitizeExpression(std::string& sanitizedExpr, const std::string& decodedCh
 	for (int i = 0; i < decodedChromosome.size(); i++) {
 		char geneChar = decodedChromosome[i];
 		
-		bool isOperand = (operands.find(geneChar) != string::npos);
-		bool isOperator = !isOperand && (operators.find(geneChar) != string::npos);
+		bool isOperand = (operands.find(geneChar) != std::string::npos);
+		bool isOperator = !isOperand && (operators.find(geneChar) != std::string::npos);
 		
-		bool isLastOperand = (operands.find(sanitizedExpr.back()) != string::npos);
-		bool isLastOperator = (operators.find(sanitizedExpr.back()) != string::npos);
+		bool isLastOperand = (operands.find(sanitizedExpr.back()) != std::string::npos);
+		bool isLastOperator = (operators.find(sanitizedExpr.back()) != std::string::npos);
 		
 		if ((isOperand && (sanitizedExpr.size() == 0 || (isLastOperator && !(sanitizedExpr.back() == '/' && geneChar == '0')))) // Operand as first character or after an operator (if not division by zero)
 			|| (isOperator && isLastOperand)) // Operator after an operand
 			sanitizedExpr += geneChar;
 	}
 	
-	if (operators.find(sanitizedExpr.back()) != string::npos) // if last character is an operator, remove it
+	if (operators.find(sanitizedExpr.back()) != std::string::npos) // if last character is an operator, remove it
 		sanitizedExpr.pop_back();
 	else if (sanitizedExpr.size() == 0)
 		sanitizedExpr = "0";
