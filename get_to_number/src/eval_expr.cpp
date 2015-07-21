@@ -52,10 +52,9 @@ bool eval_expr(const char **pe, int &lhs, bool inside) {
 }
 
 bool eval_expr(const std::string& str, int &lhs, bool inside) {
-    const char *cstr = strdup(str.c_str());
+    const char *cstr = str.c_str();
     
     bool result = eval_expr(&cstr, lhs, inside);
-    // delete cstr;
     return result;
 }
 
