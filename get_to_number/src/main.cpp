@@ -3,19 +3,8 @@
 #include <ctime>
 #include <string>
 
+#include "Chromosome.hpp"
 #include "eval_expr.hpp"
-
-const char *geneSequences[15] = { "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", NULL };
-const char genes[15] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*', '/', '\0' };
-
-// Returns the gene character (e.g. '3') corresponding to a gene sequence (e.g. "0011")
-char getGeneChar(const std::string& geneSequence)
-{
-	for (int i = 0; geneSequences[i]; ++i)
-		if (geneSequences[i] == geneSequence)
-			return genes[i];
-	return '\0';
-}
 
 // Fitness function used in selection
 float getFitness(int result, int target)
@@ -29,144 +18,100 @@ int getTarget(int min, int max)
 	return rand() % (min + max) + min;
 }
 
-// Creates a random chromosome (gene sequences) from scratch
-void encodeChromosome(std::string& encodedChromosome, int genesNumber)
-{
-	for (int i = 0; i < 4 * genesNumber; ++i)
-		encodedChromosome += '0' + rand() % 2;
-}
-
-// Creates a chromosome (gene sequences) starting from a previously generated chromosome, with possible random mutations
-void encodeNextGenChromosome(std::string& encodedChromosome, std::string& prevChromosome)
-{
-	const float mutationRate = 0.001;
-	int mutationsNumber = 0;
-	
-	for (int i = 0; i < prevChromosome.size(); ++i)
-	{
-		char bit = prevChromosome[i];
-		if (rand() % 101 <= (mutationRate * 100))
-		{
-			bit = (bit == '0' ? '1' : '0');
-			++mutationsNumber;
-		}
-		encodedChromosome += bit;
-	}
-	std::cout << "Mutations: " << mutationsNumber << '\n';
-}
-
-// Creates a string of decoded gene characters from an encoded chromosome
-void decodeChromosome(std::string& decodedChromosome, const std::string& encodedChromosome)
-{
-	for (int i = 0; i < encodedChromosome.size(); ) {
-		std::string geneBits;
-		for (int j = 0; j < 4; ++j)
-			geneBits += encodedChromosome[i++];
-		char geneChar = getGeneChar(geneBits);
-		decodedChromosome += geneChar ? geneChar : '?';
-	}
-}
-
-// Creates a usable mathematical expression in a string
-void sanitizeExpression(std::string& sanitizedExpr, const std::string& decodedChromosome)
-{
-	static const std::string operands = "0123456789";
-	static const std::string operators = "+-*/";
-	
-	for (int i = 0; i < decodedChromosome.size(); i++) {
-		char geneChar = decodedChromosome[i];
-		
-		bool isOperand = (operands.find(geneChar) != std::string::npos);
-		bool isOperator = !isOperand && (operators.find(geneChar) != std::string::npos);
-		
-		bool isLastOperand = (operands.find(sanitizedExpr.back()) != std::string::npos);
-		bool isLastOperator = (operators.find(sanitizedExpr.back()) != std::string::npos);
-		
-		if ((isOperand && (sanitizedExpr.size() == 0 || (isLastOperator && !(sanitizedExpr.back() == '/' && geneChar == '0')))) // Operand as first character or after an operator (if not division by zero)
-			|| (isOperator && isLastOperand)) // Operator after an operand
-			sanitizedExpr += geneChar;
-	}
-	
-	if (operators.find(sanitizedExpr.back()) != std::string::npos) // if last character is an operator, remove it
-		sanitizedExpr.pop_back();
-	else if (sanitizedExpr.size() == 0)
-		sanitizedExpr = "0";
-}
-
 // Starts the algorithm with the required parameters
-void startGenerations(int targetNumber, int maxGenerations, int genesMinNumber, int genesMaxNumber)
+void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber, uint genesMaxNumber, uint logThreshold)
 {
 	bool solutionFound = false;
 	int generation = 0;
-	int genesNumber = rand() % (genesMaxNumber - genesMinNumber + 1) + genesMinNumber;
+	Chromosome *fittestChromosome = NULL;
+	float bestFitness = 0;
 	
-	std::cout << "Genes number: " << genesNumber << std::endl << std::endl;
-	
-	std::string prevChromosome;
-	float prevFitness = 0;
 	for (unsigned int i = 0; !solutionFound && (maxGenerations == 0 || i < maxGenerations); ++i)
 	{
-		std::string encodedChromosome;
+		bool writeLog = (generation % logThreshold == 0);
 		
-		std::cout << "Generation " << generation + 1 << std::endl; 
+		if (writeLog)
+			std::cout << "Generation " << generation << std::endl; 
 		
-		if (generation == 0)
-			encodeChromosome(encodedChromosome, genesNumber);
+		Chromosome *newChromosome = NULL;
+		
+		if (fittestChromosome)
+			newChromosome = new Chromosome(*fittestChromosome);
 		else
-			encodeNextGenChromosome(encodedChromosome, prevChromosome);
-		std::cout << "Encoded chromosome: " << encodedChromosome << '\n';
-		
-		std::string decodedChromosome;
-		decodeChromosome(decodedChromosome, encodedChromosome);
-		std::cout << "Decoded chromosome: " << decodedChromosome << '\n';
-		
-		std::string sanitizedExpression;
-		sanitizeExpression(sanitizedExpression, decodedChromosome);
-		std::cout << "Sanitized expression: " << sanitizedExpression << '\n';
+			newChromosome = new Chromosome(genesMinNumber, genesMaxNumber);
 		
 		int result = 0;
-		eval_expr(sanitizedExpression, result);
-		std::cout << "Chromosome result: " << result << '\n';
+		eval_expr(newChromosome->getSanitized(), result);
+		if (writeLog)
+			std::cout << "Chromosome result: " << result << '\n';
 		
 		if (result != targetNumber) {
 			float fitness = getFitness(result, targetNumber);
-			std::cout << "Chromosome fitness: " << fitness;
-			if (fitness > prevFitness) {
-				std::cout << " -> selected" << '\n';
-				prevChromosome = encodedChromosome;
-				prevFitness = fitness;
+			
+			if (writeLog)
+				std::cout << "Chromosome fitness: " << fitness;
+			
+			if (fitness > bestFitness) {
+				if (writeLog)
+					std::cout << " -> selected" << '\n';
+				
+				if (fittestChromosome)
+					delete fittestChromosome;
+				fittestChromosome = newChromosome;
+				bestFitness = fitness;
 			}
 			else
-				std::cout << " -> rejected" << '\n';
+			{
+				if (writeLog)
+					std::cout << " -> rejected" << '\n';
+				delete newChromosome;
+			}
 		}
 		else
+		{
+			if (fittestChromosome)
+				delete fittestChromosome;
+			fittestChromosome = newChromosome;
+			
 			solutionFound = true;
+		}
 		
-		std::cout << std::endl;
+		if (writeLog)
+			std::cout << std::endl;
+		
 		++generation;
 	}
 	
 	std::cout << "Target number: " << targetNumber << std::endl
 		<< "Solution " << (solutionFound ? "" : "not ") << "found after " << generation << " generations" << std::endl;
+	
+	if (fittestChromosome)
+	{
+		if (solutionFound)
+			fittestChromosome->displayInfo();
+		
+		delete fittestChromosome;
+	}
 }
 
-// Sets up the parameters
-void geneticExpressions()
+void runSimulation()
 {
 	int genesMinNumber = 15;
 	int genesMaxNumber = 19;
-	int maxGenerations = 500000; // 0 -> no limit
+	int maxGenerations = 1000000; // 0 -> no limit
+	int targetNumber = getTarget(1, 500);
+	int logThreshold = 10000;
 	
-	int targetNumber = getTarget(1, 1000);
 	std::cout << "Target number: " << targetNumber << std::endl;
 	
-	startGenerations(targetNumber, maxGenerations, genesMinNumber, genesMaxNumber);
+	startGenerations(targetNumber, maxGenerations, genesMinNumber, genesMaxNumber, logThreshold);
 }
 
 int main(int argc, char **argv)
 {
 	srand(time(NULL));
-	geneticExpressions();
+	
+	runSimulation();
 	
 	return 0;
 }
