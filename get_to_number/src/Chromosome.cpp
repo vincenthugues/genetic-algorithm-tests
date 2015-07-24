@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "Chromosome.hpp"
 
 Chromosome::Chromosome(int genesMinNumber, int genesMaxNumber)
