@@ -2,7 +2,7 @@
 
 #### PROJECT SETTINGS ####
 # The name of the executable to be created
-BIN_NAME := genetic_algorithm
+BIN_NAME := get_to_number
 # Compiler used
 CXX ?= g++
 # Extension of source files used in the project
