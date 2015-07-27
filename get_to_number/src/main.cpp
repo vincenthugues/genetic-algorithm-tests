@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <chrono>
 
 #include "Chromosome.hpp"
 #include "eval_expr.hpp"
@@ -104,7 +105,14 @@ void runSimulation()
 	
 	std::cout << "Target number: " << targetNumber << std::endl;
 	
+	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+	
 	startGenerations(targetNumber, maxGenerations, genesMinNumber, genesMaxNumber, logThreshold);
+	
+	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(t2 - t1);
+	
+	std::cout << "\nDuration: " << ms.count() << " milliseconds" << std::endl;
 }
 
 int main(int argc, char **argv)
