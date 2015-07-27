@@ -7,7 +7,7 @@
 #include "Chromosome.hpp"
 #include "eval_expr.hpp"
 
-// Fitness function used in selection
+// Fitness function used in selection (only when result != target)
 float getFitness(int result, int target)
 {
 	return 1.f / std::abs(result - target);
@@ -27,12 +27,13 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 	Chromosome *fittestChromosome = NULL;
 	float bestFitness = 0;
 	
+	// Run the simulation until a solution has been found or the maximum number of generations has been reached
 	for (unsigned int i = 0; !solutionFound && (maxGenerations == 0 || i < maxGenerations); ++i)
 	{
 		bool writeLog = logThreshold && (generation % logThreshold == 0);
 		
 		if (writeLog)
-			std::cout << "Generation " << generation << std::endl; 
+			std::cout << "Generation " << generation << '\n'; 
 		
 		Chromosome *newChromosome = NULL;
 		
@@ -46,15 +47,17 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 		if (writeLog)
 			std::cout << "Chromosome result: " << result << '\n';
 		
-		if (result != targetNumber) {
+		if (result != targetNumber) // Solution not yet found
+		{
 			float fitness = getFitness(result, targetNumber);
 			
 			if (writeLog)
 				std::cout << "Chromosome fitness: " << fitness;
 			
-			if (fitness > bestFitness) {
+			if (fitness > bestFitness)
+			{
 				if (writeLog)
-					std::cout << " -> selected" << '\n';
+					std::cout << " -> selected\n";
 				
 				if (fittestChromosome)
 					delete fittestChromosome;
@@ -64,11 +67,11 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 			else
 			{
 				if (writeLog)
-					std::cout << " -> rejected" << '\n';
+					std::cout << " -> rejected\n";
 				delete newChromosome;
 			}
 		}
-		else
+		else // Solution found
 		{
 			if (fittestChromosome)
 				delete fittestChromosome;
@@ -83,7 +86,7 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 		++generation;
 	}
 	
-	std::cout << "Target number: " << targetNumber << std::endl
+	std::cout << "Target number: " << targetNumber << '\n'
 		<< "Solution " << (solutionFound ? "" : "not ") << "found after " << generation << " generations" << std::endl;
 	
 	if (fittestChromosome)

@@ -22,10 +22,10 @@ Chromosome::~Chromosome()
 
 void Chromosome::displayInfo() const
 {
-	std::cout << "Genes number: " << m_genesNumber << std::endl
-		<< "Encoded chromosome: " << m_encodedStr << std::endl
-		<< "Decoded chromosome: " << m_decodedStr << std::endl
-		<< "Sanitized expression: " << m_sanitizedStr << std::endl;
+	std::cout << "Genes number: " << m_genesNumber
+		<< "\nEncoded chromosome: " << m_encodedStr
+		<< "\nDecoded chromosome: " << m_decodedStr
+		<< "\nSanitized expression: " << m_sanitizedStr << std::endl;
 }
 
 const uint& Chromosome::getGenesNumber() const
