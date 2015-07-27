@@ -29,7 +29,7 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 	
 	for (unsigned int i = 0; !solutionFound && (maxGenerations == 0 || i < maxGenerations); ++i)
 	{
-		bool writeLog = (generation % logThreshold == 0);
+		bool writeLog = logThreshold && (generation % logThreshold == 0);
 		
 		if (writeLog)
 			std::cout << "Generation " << generation << std::endl; 
