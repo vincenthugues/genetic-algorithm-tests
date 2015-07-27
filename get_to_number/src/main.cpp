@@ -20,7 +20,7 @@ int getTarget(int min, int max)
 }
 
 // Starts the algorithm with the required parameters
-void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber, uint genesMaxNumber, uint logThreshold)
+void startGenerations(int targetNumber, uint maxGenerations, uint geneCountMin, uint geneCountMax, uint logThreshold)
 {
 	bool solutionFound = false;
 	int generation = 0;
@@ -40,7 +40,7 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 		if (fittestChromosome)
 			newChromosome = new Chromosome(*fittestChromosome);
 		else
-			newChromosome = new Chromosome(genesMinNumber, genesMaxNumber);
+			newChromosome = new Chromosome(geneCountMin, geneCountMax);
 		
 		int result = 0;
 		eval_expr(newChromosome->getSanitized(), result);
@@ -100,8 +100,8 @@ void startGenerations(int targetNumber, uint maxGenerations, uint genesMinNumber
 
 void runSimulation()
 {
-	int genesMinNumber = 15;
-	int genesMaxNumber = 19;
+	int geneCountMin = 15;
+	int geneCountMax = 19;
 	int maxGenerations = 1000000; // 0 -> no limit
 	int targetNumber = getTarget(1, 500);
 	int logThreshold = 10000;
@@ -110,7 +110,7 @@ void runSimulation()
 	
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	
-	startGenerations(targetNumber, maxGenerations, genesMinNumber, genesMaxNumber, logThreshold);
+	startGenerations(targetNumber, maxGenerations, geneCountMin, geneCountMax, logThreshold);
 	
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::milliseconds ms = std::chrono::duration_cast< std::chrono::milliseconds >(t2 - t1);

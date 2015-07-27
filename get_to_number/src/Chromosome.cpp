@@ -2,15 +2,15 @@
 
 #include "Chromosome.hpp"
 
-Chromosome::Chromosome(int genesMinNumber, int genesMaxNumber)
+Chromosome::Chromosome(int geneCountMin, int geneCountMax)
 {
-	m_genesNumber = rand() % (genesMaxNumber - genesMinNumber + 1) + genesMinNumber;
+	m_geneCount = rand() % (geneCountMax - geneCountMin + 1) + geneCountMin;
 	init();
 }
 
 Chromosome::Chromosome(const Chromosome &other)
 {
-	m_genesNumber = other.getGenesNumber();
+	m_geneCount = other.getGeneCount();
 	std::string otherEncoded = other.getEncoded();
 	init(&otherEncoded);
 }
@@ -22,15 +22,15 @@ Chromosome::~Chromosome()
 
 void Chromosome::displayInfo() const
 {
-	std::cout << "Genes number: " << m_genesNumber
+	std::cout << "Gene count: " << m_geneCount
 		<< "\nEncoded chromosome: " << m_encodedStr
 		<< "\nDecoded chromosome: " << m_decodedStr
 		<< "\nSanitized expression: " << m_sanitizedStr << std::endl;
 }
 
-const uint& Chromosome::getGenesNumber() const
+const uint& Chromosome::getGeneCount() const
 {
-	return m_genesNumber;
+	return m_geneCount;
 }
 
 const std::string& Chromosome::getEncoded() const
@@ -56,7 +56,7 @@ void Chromosome::init(const std::string* otherEncoded)
 
 void Chromosome::encode()
 {
-	for (uint i = 0; i < 4 * m_genesNumber; ++i)
+	for (uint i = 0; i < 4 * m_geneCount; ++i)
 		m_encodedStr += '0' + rand() % 2;
 }
 
